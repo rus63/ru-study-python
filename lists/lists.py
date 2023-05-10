@@ -14,11 +14,11 @@ class ListExercise:
             for item in input_list:
                 if item > max_value:
                     max_value = item
-            for item in range(len(input_list)):
-                if input_list[item] > 0:
+            for item in input_list:
+                if item > 0:
                     replaced_list.append(max_value)
                 else:
-                    replaced_list.append(input_list[item])
+                    replaced_list.append(item)
             return replaced_list
         return []
 
@@ -34,7 +34,7 @@ class ListExercise:
         """
 
         def binary_search(input_list: list[int], left: int, right: int, query: int) -> int:
-            mid = left + (right - left) // 2
+            mid = (left + right) // 2
             if mid < left:
                 return -1
             if query == input_list[mid]:
