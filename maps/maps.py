@@ -50,5 +50,8 @@ class MapExercise:
                 else ""
             )
 
-        chars_count = "".join(list(map(get_movie_name, list_of_movies))).count("и")
+        names_of_movies = list(map(get_movie_name, list_of_movies))
+        chars_count = 0
+        for name in names_of_movies:
+            chars_count += name.count("и")
         return chars_count
