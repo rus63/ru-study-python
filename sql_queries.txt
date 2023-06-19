@@ -1,0 +1,102 @@
+Запросы на создание таблиц:
+
+CREATE TABLE regions (
+	id serial PRIMARY KEY,	
+	name varchar	
+);
+
+INSERT INTO regions (name) VALUES 
+('ALmaty'),
+('Moscow'),
+('Berlin'),
+('Washington');
+
+CREATE TABLE locations (
+	id serial PRIMARY KEY,
+	address varchar,
+	region_id INTEGER REFERENCES regions (id)
+);
+
+INSERT INTO locations (address, region_id) VALUES
+('Mukanov st', 1), ('Lenina st', 2), 
+('Wilhelmstrasse st', 3), ('H st', 4), 
+('Baizakov st', 1), ('Pushkina st', 2), 
+('Meringdam st', 3), ('G st', 4);
+
+CREATE TABLE employees (
+	id SERIAL PRIMARY KEY,
+	name VARCHAR, 
+	last_name VARCHAR,
+	hire_date DATE,
+	salary INTEGER,
+	email VARCHAR,
+	manager_id INTEGER,
+	department_id INTEGER
+);
+
+CREATE TABLE departments (
+	id serial PRIMARY KEY,
+	name varchar,
+	location_id INTEGER REFERENCES locations (id),
+	manager_id INTEGER REFERENCES employees (id)
+);
+
+INSERT INTO departments (name, location_id, manager_id) VALUES 
+('dep1', 1, 2), 
+('dep2', 2, 5), 
+('dep3', 3, 7), 
+('dep4', 4, 8);
+
+INSERT INTO employees (name, last_name, hire_date, salary, email, manager_id, department_id) VALUES 
+('William', 'Johnson', '2023-02-06', 1000, null, 2, 1),
+('Theodore', 'Roberson', '2022-09-15', 2500, 'tr@dualbootpartners.com', 5, 1),	
+('Chad', 'Phillips', '2022-07-21', 2000, 'cp@dualbootpartners.com', 7, 3),
+('Kevin', 'Powell', '2020-05-08', 1800, 'kp@mail.com', 8, 2),
+('Chris', 'Lee', '2023-06-10', 2700, 'cl@dualbootpartners.com', 2, 4),
+('Tony', 'Miller', '2023-06-01', 3400, 'tm@dualbootpartners.com', 5, 4),
+('Brad', 'Turner', '2023-06-04', 6500, 'bt@dualbootpartners.com', 7, 1),
+('Paul', 'Taylor', '2023-06-05', 7800, 'pt@mail.com', 8, 2),
+('Tom', 'Moore', '2020-05-21', 2700, 'tm@dualbootpartners.com', 5, 2),
+('Stiven', 'Scott', '2020-05-08', 700, null, 5, 3),
+('Amber', 'King', '2020-04-30', 900, 'ak@dualbootpartners.com', 7, 3),
+('Jessy', 'Smith', '2020-07-14', 600, 'js@dualbootpartners.com', 2, 1),
+('Luke', 'Sanders', '2020-09-17', 4700, 'ls@mail.com', 8, 4),
+('Jeff', 'James', '2020-11-09', 6300, 'jj@dualbootpartners.com', 8, 4);
+
+ALTER TABLE employees ADD CONSTRAINT fk_department_id 
+    FOREIGN KEY (department_id) REFERENCES departments (id);
+
+ALTER TABLE employees ADD CONSTRAINT fk_manager_id 
+    FOREIGN KEY (manager_id) REFERENCES employees (id);
+
+
+Выборки:
+
+1) Показать работников у которых нет почты или почта не в корпоративном домене (домен dualbootpartners.com)
+
+SELECT id, name, last_name FROM employees WHERE email IS NULL or email NOT LIKE '%@dualbootpartners.com';
+
+2) Получить список работников нанятых в последние 30 дней
+
+SELECT id, name, last_name FROM employees WHERE ('2023-06-19' - hire_date)<30;
+
+3) Найти максимальную и минимальную зарплату по каждому департаменту
+
+SELECT MAX(salary), MIN(salary), department_id FROM employees GROUP BY department_id;
+
+4) Посчитать количество работников в каждом регионе
+
+SELECT regions.name, COUNT(employees) FROM employees
+LEFT JOIN departments on employees.department_id=departments.id 
+LEFT JOIN locations on departments.id=locations.id 
+LEFT JOIN regions on locations.id=regions.id
+GROUP BY regions.id;
+
+5) Показать сотрудников у которых фамилия длиннее 10 символов
+
+SELECT id, name, last_name FROM employees WHERE LENGTH(last_name)>10;
+
+6) Показать сотрудников с зарплатой выше средней по всей компании
+
+SELECT id, name, last_name, salary FROM employees WHERE salary>(SELECT avg(salary) FROM employees);
+
