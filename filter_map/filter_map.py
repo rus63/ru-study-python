@@ -16,4 +16,4 @@ class FilterMapExercise:
         :return: Отфильтрованный список.
         """
         mapped_list = list(map(func, input_array))
-        return [item[1] for item in mapped_list if item[0]]
+        return [value for flag, value in mapped_list if flag]
