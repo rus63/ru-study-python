@@ -1,4 +1,5 @@
-from flask import Flask
+from flask import Flask, request, jsonify, json
+from http import HTTPStatus
 
 
 class FlaskExercise:
@@ -28,4 +29,42 @@ class FlaskExercise:
 
     @staticmethod
     def configure_routes(app: Flask) -> None:
-        pass
+        users = {}
+        
+        @app.route("/user", methods=["POST"])
+        def post():
+            data = request.get_json()
+            
+            if 'name' not in data:
+                response = {"name": "This field is required"}
+                return jsonify(errors = response), 422  
+            name = data['name']
+            users[name] = {}
+            return jsonify(data = f"User {name} is created!"), 201
+
+     
+        @app.route("/user/<name>", methods=["GET"])
+        def get(name):
+            if name in users:
+                response = f"My name is {name}"
+                return jsonify(data = response), 200
+            return jsonify(''), 404
+                
+        @app.route("/user/<name>", methods=["PATCH"])
+        def patch(name):
+            if name in users:
+                data = request.get_json()
+                new_name = data["name"]
+                users['name'] = new_name
+                response = f"My name is {new_name}"
+                return jsonify(data = response), 200
+            return jsonify(''), 404
+
+        @app.route("/user/<name>", methods=["DELETE"])
+        def delete(name):
+            if name in users:
+                del users[name]
+                return '', 204
+            return jsonify(''), 404
+        
+
